@@ -142,3 +142,13 @@ Componente recomendado: `components/shared/data-table.tsx` (basado en **TanStack
 - [ ] ¿La tabla usa `use-pagination.ts` y envía `sortBy/sortOrder` válidos?
 - [ ] ¿No hay **secretos** ni **tokens** hardcodeados?
 
+---
+*Crea un módulo en src/app/(private)/<module> con:*
+- page.tsx y components/ con archivos en kebab-case.
+- API centralizada en src/api/<module>.ts usando axiosInstance desde lib/api.ts.
+- Funciones CRUD: getAll, getById, create, update, remove.
+- Soporte para paginación (page, pageSize), orden (sortBy, sortOrder) y filtros (filters).
+- Tabla con @tanstack/react-table, paginación controlada y filtros.
+- Formulario con react-hook-form y validaciones zod.
+- Importar UI desde components/ui/ y helpers desde lib/.
+- Seguir convenciones: nombres en inglés, comentarios cortos en español si aportan contexto, rutas base /api/v1/<module>.
