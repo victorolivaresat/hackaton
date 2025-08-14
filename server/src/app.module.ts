@@ -2,7 +2,7 @@
 // import { Module } from '@nestjs/common';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { TypeOrmModule  } from '@nestjs/typeorm';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { APP_FILTER } from '@nestjs/core';
 
@@ -22,7 +22,7 @@ import { ModuleModule } from '@modules/module/module.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ 
+    ConfigModule.forRoot({
       isGlobal: true,
       validate: (config) => {
         const configService = new ConfigService(config);
@@ -35,13 +35,11 @@ import { ModuleModule } from '@modules/module/module.module';
       inject: [ConfigService],
       useFactory: getDatabaseConfig,
     }),
-
-    // Módulos de infraestructura
-    AuthModule,
-    UserModule,
-    RoleModule,
-    PermissionModule,
-    ModuleModule,
+  AuthModule,
+  UserModule,
+  RoleModule,
+  PermissionModule,
+  ModuleModule
   ],
   controllers: [AppController],
   providers: [

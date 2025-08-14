@@ -18,12 +18,25 @@ import { FiltersUserDto } from '../dto/filters-user.dto';
 import { UserMapper } from '../interfaces/user.mapper';
 import { PasswordService } from './password.service';
 
+// Whitelist de columnas ordenables: mapea snake/camel → prop válida de la entidad
+const SORT_MAP: Record<string, string> = {
+  createdAt: 'u.createdAt',
+  created_at: 'u.createdAt',
+  email: 'u.email',
+  username: 'u.username',
+  firstName: 'u.firstName',
+  first_name: 'u.firstName',
+  lastName: 'u.lastName',
+  last_name: 'u.lastName',
+  isActive: 'u.isActive',
+  is_active: 'u.isActive',
+};
+
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
-    @InjectRepository(UserRole)
-    private readonly userRoleRepo: Repository<UserRole>,
+    @InjectRepository(UserRole) private readonly userRoleRepo: Repository<UserRole>,
     @InjectRepository(Role) private readonly roleRepo: Repository<Role>,
     private readonly passwordService: PasswordService,
   ) {}
@@ -45,6 +58,7 @@ export class UserService {
   async findAllPaged(q: FiltersUserDto) {
     const page = q.page ?? 1;
     const pageSize = q.pageSize ?? 10;
+
     const qb = this.userRepo
       .createQueryBuilder('u')
       .leftJoinAndSelect('u.roles', 'ur')
@@ -60,10 +74,10 @@ export class UserService {
       );
     }
 
-    qb.orderBy(
-      q.sortBy ? `u.${q.sortBy}` : 'u.createdAt',
-      q.sortOrder ?? 'DESC',
-    );
+    const sortColumn = q.sortBy ? (SORT_MAP[q.sortBy] ?? 'u.createdAt') : 'u.createdAt';
+    const sortOrder: 'ASC' | 'DESC' = q.sortOrder ?? 'DESC';
+
+    qb.orderBy(sortColumn, sortOrder);
     qb.skip((page - 1) * pageSize).take(pageSize);
 
     const [rows, total] = await qb.getManyAndCount();
@@ -148,10 +162,8 @@ export class UserService {
       const entity = await repo.findOne({ where: { id } });
       if (!entity) throw new NotFoundException('Usuario no encontrado');
 
-      if (email && email !== entity.email)
-        await this.validateEmailNotExists(email);
-      if (username && username !== entity.username)
-        await this.validateUsernameNotExists(username);
+      if (email && email !== entity.email) await this.validateEmailNotExists(email);
+      if (username && username !== entity.username) await this.validateUsernameNotExists(username);
 
       Object.assign(entity, {
         ...dto,
@@ -226,14 +238,12 @@ export class UserService {
 
   private async validateEmailNotExists(email: string): Promise<void> {
     const existing = await this.userRepo.findOne({ where: { email } });
-    if (existing)
-      throw new ConflictException('El email ya está registrado en el sistema');
+    if (existing) throw new ConflictException('El email ya está registrado en el sistema');
   }
 
   private async validateUsernameNotExists(username: string): Promise<void> {
     const existing = await this.userRepo.findOne({ where: { username } });
-    if (existing)
-      throw new ConflictException('El nombre de usuario ya está en uso');
+    if (existing) throw new ConflictException('El nombre de usuario ya está en uso');
   }
 
   private async validateRoleExists(roleId: number): Promise<void> {

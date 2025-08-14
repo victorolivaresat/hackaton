@@ -93,7 +93,7 @@ export const getDatabaseConfig = (
       Role,
       RolePermission,
       Permission,
-      Module,
+      Module
     ],
   };
 };
