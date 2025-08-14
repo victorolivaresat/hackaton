@@ -2,7 +2,7 @@ import { ApiPropertyOptional } from '@nestjs/swagger';
 import { Type, Transform } from 'class-transformer';
 import { IsInt, IsOptional, IsString, Min, Max, IsIn } from 'class-validator';
 
-export class FiltersUserDto {
+export class FiltersRoleDto {
   @ApiPropertyOptional({ example: 1 })
   @Type(() => Number)
   @IsInt()
@@ -16,23 +16,20 @@ export class FiltersUserDto {
   @Max(100)
   pageSize = 10;
 
-  // Permitimos camelCase y snake_case, pero lo validamos con whitelist
   @ApiPropertyOptional({ example: 'created_at', enum: [
     'created_at',
-    'email',
-    'username',
-    'first_name',
-    'last_name',
-    'is_active',
+    'name',
+    'description',
+    'updated_at',
+    'deleted_at',
   ] })
   @IsOptional()
   @IsIn([
     'created_at',
-    'email',
-    'username',
-    'first_name',
-    'last_name',
-    'is_active',
+    'name',
+    'description',
+    'updated_at',
+    'deleted_at',
   ])
   sortBy?: string;
 
@@ -41,7 +38,7 @@ export class FiltersUserDto {
   @IsIn(['ASC', 'DESC'])
   sortOrder?: 'ASC' | 'DESC';
 
-  @ApiPropertyOptional({ example: 'john' })
+  @ApiPropertyOptional({ example: 'admin' })
   @IsOptional()
   @IsString()
   q?: string;

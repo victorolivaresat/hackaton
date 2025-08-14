@@ -1,11 +1,21 @@
-import { Injectable, NotFoundException, ConflictException, BadRequestException } from '@nestjs/common';
+// Whitelist de columnas ordenables
+const SORT_MAP: Record<string, string> = {
+  created_at: 'role.createdAt',
+  name: 'role.name',
+  description: 'role.description',
+  updated_at: 'role.updatedAt',
+  deleted_at: 'role.deletedAt',
+};
+import { Injectable, NotFoundException, ConflictException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, IsNull } from 'typeorm';
+import { FiltersRoleDto } from '../dto/filters-role.dto';
 import { Role } from '../domain/role.entity';
 import { RolePermission } from '../domain/role-permission.entity';
 import { Permission } from '../../permission/domain/permission.entity';
 import { RoleCreateDto } from '../dto/role-create.dto';
 import { RoleUpdateDto } from '../dto/role-update.dto';
+import { RoleMapper } from '../interfaces/role.mapper';
 
 @Injectable()
 export class RoleService {
@@ -19,12 +29,42 @@ export class RoleService {
    * Obtiene todos los roles activos del sistema
    * @returns Lista de roles con sus permisos asociados
    */
-  async findAll() {
-    return this.roleRepo.find({
-      where: { deletedAt: IsNull() },
-      relations: ['permissions', 'permissions.permission'],
-    });
+  async findAllPaged(filters?: FiltersRoleDto) {
+    try {
+      const {
+        page = 1,
+        pageSize = 10,
+        sortBy = 'created_at',
+        sortOrder = 'DESC',
+        q,
+        withDeleted,
+      } = filters || {};
+
+      const query = this.roleRepo.createQueryBuilder('role')
+        .leftJoinAndSelect('role.permissions', 'rolePermission')
+        .leftJoinAndSelect('rolePermission.permission', 'permission');
+      if (!withDeleted) {
+        query.andWhere('role.deletedAt IS NULL');
+      }
+      if (q) {
+        query.andWhere('role.name ILIKE :q OR role.description ILIKE :q', { q: `%${q}%` });
+      }
+  const sortColumn = SORT_MAP[sortBy] ?? 'role.createdAt';
+  query.orderBy(sortColumn, sortOrder);
+      query.skip((page - 1) * pageSize).take(pageSize);
+      const [roles, total] = await query.getManyAndCount();
+      return {
+        items: roles.map(r => RoleMapper.toResponseDto(r)),
+        total,
+        page,
+        pageSize,
+      };
+    } catch (error) {
+      console.error(error);
+      throw new InternalServerErrorException('Error al obtener los roles');
+    }
   }
+  
 
   /**
    * Busca un rol específico por ID
@@ -38,7 +78,7 @@ export class RoleService {
       relations: ['permissions', 'permissions.permission'],
     });
     if (!role) throw new NotFoundException('Rol no encontrado');
-    return role;
+  return RoleMapper.toResponseDto(role);
   }
 
   /**

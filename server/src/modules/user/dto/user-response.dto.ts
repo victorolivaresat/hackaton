@@ -46,3 +46,10 @@ export class UserResponseDto {
   @ApiProperty({ required: false })
   roleId?: number;
 }
+
+export class PagedUserResponseDto {
+  items: UserResponseDto[];
+  total: number;
+  page: number;
+  pageSize: number;
+}

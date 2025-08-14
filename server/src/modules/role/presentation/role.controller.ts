@@ -1,10 +1,12 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { RoleService } from '../application/role.service';
+import { FiltersRoleDto } from '../dto/filters-role.dto';
 import { RoleResponseDto } from '../dto/role-response.dto';
 import { RoleCreateDto } from '../dto/role-create.dto';
 import { RoleUpdateDto } from '../dto/role-update.dto';
 import { RolePermissionResponseDto } from '../dto/role-permission-response.dto';
+import { PagedRoleResponseDto } from '../dto/role-response.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 import { PermissionsGuard } from '../../../common/guards/permissions.guard';
 import { Permissions } from '../../../common/decorators/permissions.decorator';
@@ -23,10 +25,10 @@ export class RoleController {
   @Get()
   @Permissions('system-administration.roles.view')
   @ApiOperation({ summary: 'Obtener todos los roles' })
-  @ApiResponse({ status: 200, type: [RoleResponseDto] })
-  findAll() {
-    return this.roleService.findAll();
-  }
+    @ApiResponse({ status: 200, type: PagedRoleResponseDto, description: 'Respuesta paginada de roles' })
+    findAll(@Query() filters: FiltersRoleDto) {
+      return this.roleService.findAllPaged(filters);
+    }
 
   /**
    * Busca un rol específico por su ID

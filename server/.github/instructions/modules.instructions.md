@@ -2,7 +2,7 @@
 applyTo: "src/modules/**"
 ---
 
-# Copilot Module Instructions — Total Secure (Servicios, DTOs, Mappers, Filtros)
+# Copilot Module Instructions — Total Secure (Servicios, DTOs, Mappers, Filtros, Paginación)
 
 > Para crear/editar **entidades**, sigue **`.github/instructions/entities.instructions.md`**.  
 > Este archivo se centra en **servicios, controladores, DTOs, mappers, paginación y transacciones**.  
@@ -11,7 +11,7 @@ applyTo: "src/modules/**"
 ## Estructura por módulo (usar exactamente estos nombres)
 - `domain/` → Entidades (ver `entities.instructions.md`)
 - `application/` → Servicios/casos de uso (transacciones cuando haya multi-tabla)
-- `dto/` → `CreateDto`, `UpdateDto`, `ResponseDto`, `FiltersDto`
+- `dto/` → `CreateDto`, `UpdateDto`, `ResponseDto`, `FiltersDto`, **PagedResponseDto** (obligatorio)
 - `interfaces/` → **Mappers** (obligatorio) y adaptadores concretos si son necesarios
 - `presentation/` → Controladores NestJS (delgados, con guards/decorators de `src/common`)
 
@@ -44,6 +44,15 @@ export class <X>Mapper {
 - `Filters` (obligatorio): `page`, `pageSize`, `sortBy`, `sortOrder`, `q`, `withDeleted`.  
   - `sortBy`: **whitelist** con camelCase y snake_case.  
   - `withDeleted`: `@Transform(({ value }) => value === true || value === 'true')`.
+- **PagedResponseDto** (obligatorio):
+```ts
+export class Paged<X>ResponseDto {
+  items: <X>ResponseDto[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+```
 
 ### Plantilla `FiltersDto`
 ```ts
@@ -57,7 +66,6 @@ export class <X>FiltersDto {
 
   @ApiPropertyOptional({ example: 10 }) @Type(() => Number) @IsInt() @Min(1) @Max(100)
   pageSize = 10;
-
   @ApiPropertyOptional({ example: 'created_at', enum: [
     'createdAt','created_at',
     // agrega aquí los campos ordenables del módulo
@@ -100,6 +108,8 @@ export class <X>FiltersDto {
   type Paged<T> = { items: T[]; total: number; page: number; pageSize: number };
   ```
 - Implementar `findAll()` (rápido) y `findAllPaged(q)` (paginado/filtrado).
+- **Siempre devolver DTO paginado en endpoints de listado**.
+- Usar mappers para transformar entidades a DTOs en todas las respuestas.
 
 ## Transacciones
 - En crear/actualizar/borrar con múltiples tablas: `this.repo.manager.transaction(...)`.
@@ -111,7 +121,8 @@ export class <X>FiltersDto {
   - `@ApiTags('<Module>')`
   - `@ApiBearerAuth('access-token')`
   - `@UseGuards(JwtAuthGuard, PermissionsGuard)` + `@Permissions('...')`
-- `GET /`: si llegan parámetros de paginación/filtros → usar `findAllPaged(q)`.
+- `GET /`: si llegan parámetros de paginación/filtros → usar `findAllPaged(q)` y devolver DTO paginado.
+- Documentar con Swagger el tipo paginado en la respuesta.
 
 ## Registro de entidades en nuevos módulos (resumen)
 1. Crear entidad en `domain/` siguiendo **entities.instructions.md**.  

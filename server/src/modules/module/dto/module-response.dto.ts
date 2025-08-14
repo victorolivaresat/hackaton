@@ -16,3 +16,17 @@ export class ModuleResponseDto {
   @ApiProperty()
   updatedAt: Date;
 }
+
+export class PagedModuleResponseDto {
+  @ApiProperty({ type: [ModuleResponseDto] })
+  items: ModuleResponseDto[];
+
+  @ApiProperty()
+  total: number;
+
+  @ApiProperty()
+  page: number;
+
+  @ApiProperty()
+  pageSize: number;
+}

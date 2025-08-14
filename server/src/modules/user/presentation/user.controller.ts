@@ -8,6 +8,7 @@ import { UserUpdateDto } from '../dto/user-update.dto';
 import { UserCreateDto } from '../dto/user-create.dto';
 import { FiltersUserDto } from '../dto/filters-user.dto';
 import { UserService } from '../application/user.service';
+import { PagedUserResponseDto } from '../dto/user-response.dto';
 
 @ApiTags('User')
 @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -19,13 +20,10 @@ export class UserController {
   @Get()
   @Permissions('system-administration.users.view')
   @ApiOperation({ summary: 'Listar usuarios (paginado y filtrado)' })
-  @ApiResponse({ status: 200, type: [UserResponseDto] })
-  findAll(@Query() q: FiltersUserDto) {
-    if (q && (q.page || q.pageSize || q.q || q.sortBy || q.sortOrder || q.withDeleted)) {
+    @ApiResponse({ status: 200, type: PagedUserResponseDto, description: 'Respuesta paginada de usuarios' })
+    findAll(@Query() q: FiltersUserDto) {
       return this.service.findAllPaged(q);
     }
-    return this.service.findAll();
-  }
 
   @Get(':id')
   @Permissions('system-administration.users.view')

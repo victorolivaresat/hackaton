@@ -1,12 +1,14 @@
-import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Patch, Delete, Param, Body, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { Permissions } from '@common/decorators/permissions.decorator';
 import { PermissionsGuard } from '@common/guards/permissions.guard';
 import { ModuleResponseDto } from '../dto/module-response.dto';
+import { FiltersModuleDto } from '../dto/filters-module.dto';
 import { ModuleService } from '../application/module.service';
 import { ModuleCreateDto } from '../dto/module-create.dto';
 import { ModuleUpdateDto } from '../dto/module-update.dto';
 import { JwtAuthGuard } from '@modules/auth/jwt-auth.guard';
+import { PagedModuleResponseDto } from '../dto/module-response.dto';
 
 @ApiTags('Module')
 @Controller('modules')
@@ -21,7 +23,7 @@ export class ModuleController {
   @ApiOperation({ summary: 'Obtener todos los módulos (público)' })
   @ApiResponse({ status: 200, type: [ModuleResponseDto] })
   findAllPublic() {
-    return this.service.findAll();
+    return this.service.findAllPaged();
   }
 
   /**
@@ -33,10 +35,10 @@ export class ModuleController {
   @ApiBearerAuth('access-token')
   @Permissions('system-administration.modules.view')
   @ApiOperation({ summary: 'Obtener todos los módulos' })
-  @ApiResponse({ status: 200, type: [ModuleResponseDto] })
-  findAll() {
-    return this.service.findAll();
-  }
+    @ApiResponse({ status: 200, type: PagedModuleResponseDto, description: 'Respuesta paginada de módulos' })
+    findAll(@Query() filters: FiltersModuleDto) {
+      return this.service.findAllPaged(filters);
+    }
 
   /**
    * Busca un módulo específico por su ID

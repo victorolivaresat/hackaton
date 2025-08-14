@@ -21,15 +21,11 @@ import { PasswordService } from './password.service';
 // Whitelist de columnas ordenables: mapea snake/camel → prop válida de la entidad
 const SORT_MAP: Record<string, string> = {
   createdAt: 'u.createdAt',
-  created_at: 'u.createdAt',
   email: 'u.email',
   username: 'u.username',
   firstName: 'u.firstName',
-  first_name: 'u.firstName',
   lastName: 'u.lastName',
-  last_name: 'u.lastName',
   isActive: 'u.isActive',
-  is_active: 'u.isActive',
 };
 
 @Injectable()

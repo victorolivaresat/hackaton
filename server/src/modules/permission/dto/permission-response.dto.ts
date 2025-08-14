@@ -16,3 +16,10 @@ export class PermissionResponseDto {
   @ApiProperty()
   updatedAt: Date;
 }
+
+export class PagedPermissionResponseDto {
+  items: PermissionResponseDto[];
+  total: number;
+  page: number;
+  pageSize: number;
+}

@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete, UseGuards, Query } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
 import { PermissionService } from '../application/permission.service';
+import { FiltersPermissionDto } from '../dto/filters-permission.dto';
 import { PermissionResponseDto } from '../dto/permission-response.dto';
+import { PagedPermissionResponseDto } from '../dto/permission-response.dto';
 import { PermissionCreateDto } from '../dto/permission-create.dto';
 import { PermissionUpdateDto } from '../dto/permission-update.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
@@ -22,10 +24,10 @@ export class PermissionController {
   @Get()
   @Permissions('system-administration.permissions.view')
   @ApiOperation({ summary: 'Obtener todos los permisos' })
-  @ApiResponse({ status: 200, type: [PermissionResponseDto] })
-  findAll() {
-    return this.permissionService.findAll();
-  }
+    @ApiResponse({ status: 200, type: PagedPermissionResponseDto, description: 'Respuesta paginada de permisos' })
+    findAll(@Query() filters: FiltersPermissionDto) {
+      return this.permissionService.findAllPaged(filters);
+    }
 
   /**
    * Busca un permiso específico por su ID

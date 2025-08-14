@@ -23,3 +23,10 @@ export class RoleResponseDto {
   @ApiProperty({ type: [PermissionResponseDto], required: false })
   permissions?: PermissionResponseDto[];
 }
+
+export class PagedRoleResponseDto {
+  items: RoleResponseDto[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
