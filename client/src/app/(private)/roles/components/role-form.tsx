@@ -14,15 +14,11 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import toast from "react-hot-toast";
 
-import type { Role } from "@/types/role";
+import type { Role, RoleFormDto } from "@/types/role";
 import type { Permission } from "@/types/permission";
 import type { Module } from "@/types/module";
 
-export type RoleFormDto = {
-  name: string;
-  description?: string;
-  permissions: number[];
-};
+
 
 export const getPermissionIds = (permissions: any[] | undefined) => {
   if (!permissions) return [];
