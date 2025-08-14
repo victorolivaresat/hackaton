@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Shield, Plus, Key, Database, Users, Settings } from "lucide-react";
+import { Shield, Key, Database, Users, Settings } from "lucide-react";
 import { columns } from "./components/columns";
 import { DataTable } from "./components/data-table";
 import { PermissionCreateButton } from "./components/permission-create-button";
@@ -24,8 +24,8 @@ const Permissions = () => {
         permissionApi.getAllPermissions(),
         moduleApi.getAllModules(),
       ]);
-      setPermissions(permissionsData);
-      setModules(modulesData);
+      setPermissions(permissionsData.items); // Extraer los items de la respuesta paginada
+      setModules(modulesData.items); // Extraer los items de la respuesta paginada
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -36,8 +36,8 @@ const Permissions = () => {
   const getModulePermissionCount = () => {
     const moduleCount: { [key: number]: number } = {};
     permissions.forEach((permission) => {
-      moduleCount[permission.moduleId] =
-        (moduleCount[permission.moduleId] || 0) + 1;
+      moduleCount[permission.module.id] =
+        (moduleCount[permission.module.id] || 0) + 1;
     });
     return moduleCount;
   };

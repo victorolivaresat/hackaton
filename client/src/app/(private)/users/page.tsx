@@ -18,7 +18,7 @@ const UserPage = () => {
     try {
       setLoading(true);
       const response = await getAllUsers();
-      setUsers(response);
+      setUsers(response.items); // Extraer los items de la respuesta paginada
     } catch (error) {
       console.error("Error fetching users:", error);
     } finally {
@@ -28,8 +28,8 @@ const UserPage = () => {
 
   const activeUsers = users.filter((u) => u.isActive);
   const inactiveUsers = users.filter((u) => !u.isActive);
-  const adminUsers = users.filter((u) => u.role === "admin");
-  const analystUsers = users.filter((u) => u.role === "analyst");
+  const adminUsers = users.filter((u) => u.role.name === "admin"); // Acceder al nombre del rol
+  const analystUsers = users.filter((u) => u.role.name === "analyst"); // Acceder al nombre del rol
 
   useEffect(() => {
     refreshUsers();

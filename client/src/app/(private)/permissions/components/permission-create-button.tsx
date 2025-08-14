@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { PermissionFormModal } from "./permission-form-modal";
 import { createPermission } from "@/api/permission.api";
-import type { Permission } from "@/types/permission";
+import type { CreatePermissionDto, Permission } from "@/types/permission";
 import { Plus } from "lucide-react";
 
 interface PermissionCreateButtonProps {
@@ -15,7 +15,13 @@ export const PermissionCreateButton: React.FC<PermissionCreateButtonProps> = ({ 
   const [open, setOpen] = useState(false);
 
   const handleCreate = async (data: Partial<Permission>) => {
-    await createPermission(data as Permission);
+    // Convertir Permission a CreatePermissionDto
+    const createData: CreatePermissionDto = {
+      name: data.name!,
+      description: data.description,
+      moduleId: data.module?.id || 0,
+    };
+    await createPermission(createData);
     setOpen(false);
     onPermissionCreated?.();
   };

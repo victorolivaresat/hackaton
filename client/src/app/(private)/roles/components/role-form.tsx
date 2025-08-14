@@ -14,15 +14,15 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import toast from "react-hot-toast";
 
-import type { Role, RoleFormDto } from "@/types/role";
+import type { Role, CreateRoleDto, UpdateRoleDto } from "@/types/role";
 import type { Permission } from "@/types/permission";
 import type { Module } from "@/types/module";
 
 
 
-export const getPermissionIds = (permissions: any[] | undefined) => {
+export const getPermissionIds = (permissions: Permission[] | undefined) => {
   if (!permissions) return [];
-  return permissions.map((p) => p.permission?.id ?? p.id);
+  return permissions.map((p) => p.id);
 };
 
 interface RoleFormProps {
@@ -56,10 +56,10 @@ export default function RoleForm({ roleId, isEdit = false }: RoleFormProps) {
         console.log("Módulos cargados:", modRes);
 
         setPermissions(permRes as Permission[]);
-        setModules(modRes as Module[]);
+        setModules(modRes.items as Module[]); // Extraer los items de la respuesta paginada
 
-        if (modRes.length > 0) {
-          setActiveTab(modRes[0].id.toString());
+        if (modRes.items.length > 0) {
+          setActiveTab(modRes.items[0].id.toString());
         }
 
         // Si es edición, cargar datos del rol
@@ -127,17 +127,17 @@ export default function RoleForm({ roleId, isEdit = false }: RoleFormProps) {
         validPermissionIds.has(id)
       );
 
-      const payload: RoleFormDto = {
+      const payload: CreateRoleDto | UpdateRoleDto = {
         name: form.name.trim(),
         description: form.description?.trim(),
         permissions: filteredPermissions,
       };
 
       if (isEdit && roleId) {
-        await updateRole(Number(roleId), payload);
+        await updateRole(Number(roleId), payload as UpdateRoleDto);
         toast.success("Rol actualizado exitosamente");
       } else {
-        await createRole(payload);
+        await createRole(payload as CreateRoleDto);
         toast.success("Rol creado exitosamente");
       }
 
@@ -153,7 +153,7 @@ export default function RoleForm({ roleId, isEdit = false }: RoleFormProps) {
 
   const permissionsByModule = React.useMemo(() => {
     const result = modules.reduce<Record<string, Permission[]>>((acc, mod) => {
-      acc[mod.id] = permissions.filter((p) => p.moduleId === mod.id);
+      acc[mod.id] = permissions.filter((p) => p.module.id === mod.id);
       return acc;
     }, {});
     console.log("Permisos por módulo:", result);

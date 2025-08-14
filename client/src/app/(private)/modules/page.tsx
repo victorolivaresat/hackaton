@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import {
   Package,
-  Plus,
   Shield,
   Database,
   Calendar,
@@ -32,8 +31,8 @@ const Modules = () => {
         moduleApi.getAllModules(),
         permissionApi.getAllPermissions(),
       ]);
-      setModules(modulesData);
-      setPermissions(permissionsData);
+      setModules(modulesData.items); // Extraer los items de la respuesta paginada
+      setPermissions(permissionsData.items); // Extraer los items de la respuesta paginada
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -42,7 +41,7 @@ const Modules = () => {
   };
 
   const getModulePermissionCount = (moduleId: number) => {
-    return permissions.filter((p) => p.moduleId === moduleId).length;
+    return permissions.filter((p) => p.module.id === moduleId).length; // Acceder al id del módulo
   };
 
   const getModulesWithPermissions = () => {

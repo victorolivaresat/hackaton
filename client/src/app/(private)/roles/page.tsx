@@ -24,8 +24,8 @@ const Roles = () => {
         roleApi.getAllRoles(),
         userApi.getAllUsers(),
       ]);
-      setRoles(rolesData);
-      setUsers(usersData);
+      setRoles(rolesData.items); // Extraer los items de la respuesta paginada
+      setUsers(usersData.items); // Extraer los items de la respuesta paginada
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -35,11 +35,11 @@ const Roles = () => {
 
   const fetchRoles = async () => {
     const response = await roleApi.getAllRoles();
-    setRoles(response);
+    setRoles(response.items); // Extraer los items de la respuesta paginada
   };
 
   const getUsersCountByRole = (roleName: string) => {
-    return users.filter((user) => user.role === roleName).length;
+    return users.filter((user) => user.role.name === roleName).length; // Acceder al nombre del rol
   };
 
   const totalPermissions = roles.reduce((total, role) => {

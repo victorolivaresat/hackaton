@@ -25,8 +25,9 @@ export const columns = (options?: { onPermissionUpdated?: () => void; onPermissi
 		header: "Descripción",
 	},
 	{
-		accessorKey: "moduleId",
-		header: "ID Módulo",
+		accessorKey: "module.name",
+		header: "Módulo",
+		cell: ({ row }) => row.original.module?.name || "-",
 	},
 	{
 		accessorKey: "createdAt",

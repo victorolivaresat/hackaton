@@ -6,17 +6,16 @@ import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@
 import { InputGroup } from "@/components/ui/input-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Eye, EyeOff, Save } from "lucide-react";
-import { User } from "@/types/user";
+import { Eye, EyeOff, Save, Shield } from "lucide-react";
+import { User, CreateUserDto, UpdateUserDto } from "@/types/user";
 import { useState } from "react";
 import { getAllRoles } from '@/api/role.api';
 import type { Role } from '@/types/role';
-import { Users, Shield } from "lucide-react";
 
 interface UserFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Partial<User>) => void;
+  onSubmit: (data: CreateUserDto | UpdateUserDto) => void;
   initialData?: Partial<User>;
   isEdit?: boolean;
 }
@@ -28,7 +27,14 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   initialData = {},
   isEdit = false,
 }) => {
-  const [form, setForm] = React.useState<Partial<User>>(initialData);
+  // Tipo extendido para el formulario que incluye campos adicionales
+  type UserFormData = Partial<User> & {
+    password?: string;
+    passwordConfirm?: string;
+    roleId?: number;
+  };
+
+  const [form, setForm] = React.useState<UserFormData>(initialData);
   const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -36,10 +42,14 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
 
   React.useEffect(() => {
     if (open) {
-      setForm(initialData);
-      getAllRoles().then(setRoles);
+      // Si es edición y hay un role object, extraer el roleId
+      const formData = isEdit && initialData?.role 
+        ? { ...initialData, roleId: initialData.role.id }
+        : initialData;
+      setForm(formData);
+      getAllRoles().then((response) => setRoles(response.items));
     }
-  }, [open]);
+  }, [open, isEdit, initialData]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -48,12 +58,50 @@ export const UserFormModal: React.FC<UserFormModalProps> = ({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-    if (!isEdit && form.password !== form.passwordConfirm) {
-      setError("Las contraseñas no coinciden");
+    
+    // Validaciones básicas
+    if (!form.firstName || !form.lastName || !form.email || !form.username || !form.roleId) {
+      setError("Todos los campos obligatorios deben estar completos");
       return;
     }
-    const { passwordConfirm, id, createdAt, updatedAt, role, deletedAt, expirationPassword, ...toSend } = form;
-    onSubmit(toSend);
+    
+    if (!isEdit && (!form.password || form.password !== form.passwordConfirm)) {
+      setError("Las contraseñas son obligatorias y deben coincidir");
+      return;
+    }
+    
+    // Crear el objeto apropiado según si es edición o creación
+    if (isEdit) {
+      const updateData: UpdateUserDto = {
+        firstName: form.firstName,
+        lastName: form.lastName,
+        email: form.email,
+        username: form.username,
+        profileImage: form.profileImage,
+        isActive: form.isActive,
+        darkMode: form.darkMode,
+        expirationPassword: form.expirationPassword,
+        flagPassword: form.flagPassword,
+        roleId: form.roleId,
+        ...(form.password && { password: form.password }),
+      };
+      onSubmit(updateData);
+    } else {
+      const createData: CreateUserDto = {
+        firstName: form.firstName!,
+        lastName: form.lastName!,
+        email: form.email!,
+        username: form.username!,
+        profileImage: form.profileImage,
+        isActive: form.isActive,
+        darkMode: form.darkMode,
+        expirationPassword: form.expirationPassword,
+        flagPassword: form.flagPassword,
+        roleId: form.roleId!,
+        password: form.password!,
+      };
+      onSubmit(createData);
+    }
   };
 
   return (

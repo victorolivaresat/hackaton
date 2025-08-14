@@ -3,8 +3,8 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { UserFormModal } from "../components/user-form-modal";
-import { createUser, CreateUserDto } from "@/api/user.api";
-import type { User } from "@/types/user";
+import { createUser } from "@/api/user.api";
+import type { CreateUserDto, UpdateUserDto } from "@/types/user";
 import { Plus } from "lucide-react";
 
 interface UserCreateButtonProps {
@@ -14,11 +14,7 @@ interface UserCreateButtonProps {
 export const UserCreateButton: React.FC<UserCreateButtonProps> = ({ onUserCreated }) => {
   const [open, setOpen] = useState(false);
 
-  const handleCreate = async (data: Partial<User>) => {
-    // Validar que password esté presente antes de crear
-    if (!data.password) {
-      throw new Error('Password is required');
-    }
+  const handleCreate = async (data: CreateUserDto | UpdateUserDto) => {
     await createUser(data as CreateUserDto);
     setOpen(false);
     onUserCreated?.();

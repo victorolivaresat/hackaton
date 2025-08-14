@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Save } from "lucide-react";
-import { Permission } from "@/types/permission";
+import { Permission, CreatePermissionDto, UpdatePermissionDto } from "@/types/permission";
 import { getAllModulesPublic } from "@/api/module.api";
 import type { Module } from "@/types/module";
 import { Label } from "@/components/ui/label";
@@ -14,7 +14,7 @@ import { Label } from "@/components/ui/label";
 interface PermissionFormModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onSubmit: (data: Partial<Permission>) => void;
+  onSubmit: (data: CreatePermissionDto | UpdatePermissionDto) => void;
   initialData?: Partial<Permission>;
   isEdit?: boolean;
 }
@@ -26,13 +26,17 @@ export const PermissionFormModal: React.FC<PermissionFormModalProps> = ({
   initialData = {},
   isEdit = false,
 }) => {
-  const [form, setForm] = React.useState<Partial<Permission>>(initialData);
+  const [form, setForm] = React.useState<Partial<Permission> & { moduleId?: number }>(initialData);
   const [error, setError] = React.useState<string | null>(null);
   const [modules, setModules] = React.useState<Module[]>([]);
 
   React.useEffect(() => {
     if (open) {
-      setForm(initialData);
+      // Si es edición y hay un module object, extraer el moduleId
+      const formData = isEdit && initialData?.module 
+        ? { ...initialData, moduleId: initialData.module.id }
+        : initialData;
+      setForm(formData);
       setError(null);
       getAllModulesPublic().then(setModules);
     }
@@ -54,7 +58,23 @@ export const PermissionFormModal: React.FC<PermissionFormModalProps> = ({
       setError("El módulo es obligatorio");
       return;
     }
-    onSubmit(form);
+    
+    // Crear el objeto apropiado según si es edición o creación
+    if (isEdit) {
+      const updateData: UpdatePermissionDto = {
+        name: form.name,
+        description: form.description,
+        moduleId: form.moduleId,
+      };
+      onSubmit(updateData);
+    } else {
+      const createData: CreatePermissionDto = {
+        name: form.name!,
+        description: form.description,
+        moduleId: form.moduleId!,
+      };
+      onSubmit(createData);
+    }
   };
 
   return (

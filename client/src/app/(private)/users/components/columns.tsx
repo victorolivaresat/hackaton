@@ -89,12 +89,12 @@ export const columns = (options?: {
     ),
   },
   {
-    accessorKey: "role",
+    accessorKey: "role.name",
     header: ({ column }) => <DataTableHeader column={column} title="Rol" />,
     cell: ({ row }) => (
       <span className="flex items-center gap-2 font-semibold text-blue-700 dark:text-blue-300">
         <Shield size={16} />
-        {row.getValue("role") || "-"}
+        {row.original.role?.name || "-"}
       </span>
     ),
   },
