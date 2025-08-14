@@ -5,7 +5,7 @@ export type Permission = {
   id: number;
   name: string;
   description?: string | null;
-  module: {
+  module?: {
     id: number;
     name: string;
   };

@@ -34,10 +34,16 @@ const Permissions = () => {
   };
 
   const getModulePermissionCount = () => {
+    if (!permissions || !Array.isArray(permissions)) {
+      return {};
+    }
     const moduleCount: { [key: number]: number } = {};
     permissions.forEach((permission) => {
-      moduleCount[permission.module.id] =
-        (moduleCount[permission.module.id] || 0) + 1;
+      // Verificar que permission y permission.module existen antes de acceder a su id
+      if (permission && permission.module && permission.module.id) {
+        moduleCount[permission.module.id] =
+          (moduleCount[permission.module.id] || 0) + 1;
+      }
     });
     return moduleCount;
   };

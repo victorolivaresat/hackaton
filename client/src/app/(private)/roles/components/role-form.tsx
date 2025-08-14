@@ -152,8 +152,11 @@ export default function RoleForm({ roleId, isEdit = false }: RoleFormProps) {
   };
 
   const permissionsByModule = React.useMemo(() => {
+    if (!permissions || !Array.isArray(permissions) || !modules || !Array.isArray(modules)) {
+      return {};
+    }
     const result = modules.reduce<Record<string, Permission[]>>((acc, mod) => {
-      acc[mod.id] = permissions.filter((p) => p.module.id === mod.id);
+      acc[mod.id] = permissions.filter((p) => p && p.module && p.module.id === mod.id);
       return acc;
     }, {});
     console.log("Permisos por módulo:", result);

@@ -41,7 +41,10 @@ const Modules = () => {
   };
 
   const getModulePermissionCount = (moduleId: number) => {
-    return permissions.filter((p) => p.module.id === moduleId).length; // Acceder al id del módulo
+    if (!permissions || !Array.isArray(permissions)) {
+      return 0;
+    }
+    return permissions.filter((p) => p && p.module && p.module.id === moduleId).length;
   };
 
   const getModulesWithPermissions = () => {
