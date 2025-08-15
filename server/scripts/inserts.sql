@@ -48,7 +48,7 @@ VALUES ('admin', 'System administrator', NOW(), NOW());
 INSERT INTO users (
   first_name, last_name, email, password, username, is_active, dark_mode, flag_password, created_at, updated_at
 ) VALUES (
-  'Admin', 'User', 'admin@example.com', '$2b$10$r6omebWQmmcK9XTQIw12r.lu8JHB4EXKVD0SV.SaM.D90xvA6RLF.', 'admin', TRUE, FALSE, FALSE, NOW(), NOW()
+  'Admin', 'User', 'admin@example.com', '$2b$10$i4kpmy91LPER5w0Xplt7y.NBFXi.PXIhnru3HpNHLCH/SUs9x5bsq', 'admin', TRUE, FALSE, FALSE, NOW(), NOW()
 );
 
 -- Get user id

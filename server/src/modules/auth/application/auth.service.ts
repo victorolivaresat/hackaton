@@ -27,6 +27,7 @@ export class AuthService {
       .leftJoinAndSelect('userRole.role', 'role')
       .leftJoinAndSelect('role.permissions', 'rolePermission')
       .leftJoinAndSelect('rolePermission.permission', 'permission')
+      .leftJoinAndSelect('permission.module', 'module') 
       .where('user.email = :email', { email })
       .getOne();
 
@@ -81,6 +82,13 @@ export class AuthService {
           id: perm.id,
           name: perm.name,
           description: perm.description ?? '',
+          moduleId: perm.moduleId,
+          module: perm.module
+            ? {
+                id: perm.module.id,
+                name: perm.module.name,
+              }
+            : { id: 0, name: '' }, // Provide a default ModuleDto if null
           createdAt: perm.createdAt,
           updatedAt: perm.updatedAt,
         };

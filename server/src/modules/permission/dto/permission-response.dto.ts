@@ -1,5 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
 
+export class ModuleDto {
+  @ApiProperty()
+  id: number;
+
+  @ApiProperty()
+  name: string;
+}
+
+
 export class PermissionResponseDto {
   @ApiProperty()
   id: number;
@@ -9,6 +18,12 @@ export class PermissionResponseDto {
 
   @ApiProperty({ required: false })
   description?: string;
+
+  @ApiProperty()
+  moduleId: number;
+
+  @ApiProperty({ type: ModuleDto })
+  module: ModuleDto;
 
   @ApiProperty()
   createdAt: Date;

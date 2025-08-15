@@ -39,6 +39,8 @@ export function DataTable<TValue>({ columns, data, headerActions }: DataTablePro
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
 
+  console.log("Columnas recibidas:", columns);////pruebita
+
   const table = useReactTable({
     data,
     columns,
@@ -88,9 +90,9 @@ export function DataTable<TValue>({ columns, data, headerActions }: DataTablePro
         </div>
         <div className="col-span-4">
           <Input
-            placeholder="Filtrar por ID de módulo..."
-            value={(table.getColumn("moduleId")?.getFilterValue() as string) ?? ""}
-            onChange={(e) => table.getColumn("moduleId")?.setFilterValue(e.target.value)}
+            placeholder="Filtrar por módulo..."
+            value={(table.getColumn("module")?.getFilterValue() as string) ?? ""}
+            onChange={(e) => table.getColumn("module")?.setFilterValue(e.target.value)}
             className="w-full"
           />
         </div>

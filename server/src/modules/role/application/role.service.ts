@@ -42,7 +42,8 @@ export class RoleService {
 
       const query = this.roleRepo.createQueryBuilder('role')
         .leftJoinAndSelect('role.permissions', 'rolePermission')
-        .leftJoinAndSelect('rolePermission.permission', 'permission');
+        .leftJoinAndSelect('rolePermission.permission', 'permission')
+        .leftJoinAndSelect('permission.module', 'module');
       if (!withDeleted) {
         query.andWhere('role.deletedAt IS NULL');
       }
@@ -75,7 +76,7 @@ export class RoleService {
   async findOne(id: number) {
     const role = await this.roleRepo.findOne({
       where: { id, deletedAt: IsNull() },
-      relations: ['permissions', 'permissions.permission'],
+      relations: ['permissions', 'permissions.permission', 'permissions.permission.module'],
     });
     if (!role) throw new NotFoundException('Rol no encontrado');
   return RoleMapper.toResponseDto(role);
@@ -112,7 +113,7 @@ export class RoleService {
 
     return this.roleRepo.findOne({
       where: { id: role.id },
-      relations: ['permissions', 'permissions.permission'],
+      relations: ['permissions', 'permissions.permission', 'permissions.permission.module'],
     });
   }
 
@@ -194,7 +195,8 @@ export class RoleService {
    */
   async getAvailablePermissions() {
     return this.permissionRepo.find({
-      select: ['id', 'name', 'description', 'moduleId'],
+      //select: ['id', 'name', 'description', 'moduleId'],
+      relations: ['module'],
       order: { name: 'ASC' }
     });
   }

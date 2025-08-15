@@ -24,9 +24,15 @@ export const columns = (options?: { onPermissionUpdated?: () => void; onPermissi
 		accessorKey: "description",
 		header: "Descripción",
 	},
+	// {
+	// 	accessorKey: "moduleId",
+	// 	header: "ID de Módulo",
+	// 	cell: ({ row }) => row.original.module?.id ?? "-",
+	// },
 	{
-		accessorKey: "module.name",
+		accessorKey: "module", // clave plana
 		header: "Módulo",
+		accessorFn: (row) => row.module?.name ?? "-", // para filtrado y ordenamiento
 		cell: ({ row }) => row.original.module?.name || "-",
 	},
 	{

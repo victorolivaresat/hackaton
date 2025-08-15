@@ -11,12 +11,18 @@ export class PermissionMapper {
   }
 
   static toResponseDto(entity: Permission): PermissionResponseDto {
+  // Log para diagnosticar el valor real de la relación module
+  //console.log('PermissionMapper entity.module:', entity.module);////comentar solo fue prueba
     return {
       id: entity.id,
       name: entity.name,
       description: entity.description,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
+      moduleId: entity.moduleId,
+      module: entity.module
+        ? { id: entity.module.id, name: entity.module.name }
+        : { id: 0, name: '' },
     };
   }
 }

@@ -32,7 +32,8 @@ export class PermissionService {
         withDeleted,
       } = filters || {};
 
-      const query = this.permissionRepo.createQueryBuilder('permission');
+      const query = this.permissionRepo.createQueryBuilder('permission')
+        .leftJoinAndSelect('permission.module', 'module');
       if (!withDeleted) {
         query.andWhere('permission.deletedAt IS NULL');
       }
